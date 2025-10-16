@@ -189,7 +189,6 @@ class XYModelSimulation {
     this.ctx.fillStyle = '#1a1a1a';
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     
-    this.ctx.strokeStyle = 'white';
     this.ctx.lineWidth = 1.5;
 
     // --- JITTER FIX: Make the animation faster at high temperatures ---
@@ -222,6 +221,11 @@ class XYModelSimulation {
   }
 
   private drawArrow(x: number, y: number, angle: number): void {
+    // --- NEW: Convert angle to HSL color ---
+    // Convert radians (0 to 2*PI) to degrees (0 to 360) for the hue value
+    const hue = (angle * 180 / Math.PI + 360) % 360; 
+    this.ctx.strokeStyle = `hsl(${hue}, 100%, 70%)`; // Bright, saturated color
+
     const endX = x + Math.cos(angle) * this.arrowLength;
     const endY = y + Math.sin(angle) * this.arrowLength;
     
@@ -229,6 +233,7 @@ class XYModelSimulation {
     this.ctx.moveTo(x, y);
     this.ctx.lineTo(endX, endY);
     
+    // Arrowhead logic (unchanged)
     const headLength = this.arrowLength * 0.3;
     this.ctx.moveTo(endX, endY);
     this.ctx.lineTo(
