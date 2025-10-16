@@ -1,0 +1,95 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+canvas {
+  display: block;
+  background-color: #1a1a1a;
+}
+
+#controls {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background-color: #b3e5fc; /* Regal, lightish blue */
+  color: #01579b; /* Darker blue for text */
+  padding: 16px;
+  border-radius: 12px;
+  border: 3px solid #01579b;
+  box-shadow: 6px 6px 0px #01579b;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  font-weight: bold;
+  cursor: move; /* NEW: Indicate that the panel is draggable */
+  user-select: none; /* NEW: Prevent text selection while dragging */
+}
+
+#reset-button {
+  background-color: #ffffff;
+  color: #01579b;
+  border: 3px solid #01579b;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: bold;
+  font-size: 1em;
+  cursor: pointer;
+  box-shadow: 4px 4px 0px #01579b;
+  transition: all 0.1s ease-in-out;
+}
+
+#reset-button:active {
+  box-shadow: none;
+  transform: translate(4px, 4px);
+}
+
+.slider-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 150px;
+  height: 8px;
+  background: #01579b;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: #ffffff;
+  border: 3px solid #01579b;
+  border-radius: 50%;
+}
+
+/* --- Mobile Layout --- */
+@media (max-width: 600px) {
+  #controls {
+    top: auto;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+  }
+}
