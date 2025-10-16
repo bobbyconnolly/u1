@@ -12,7 +12,7 @@ class XYModelSimulation {
   // renderGrid = the smoothly animated visual state
   private grid: number[][];
   private renderGrid: number[][];
-
+  
   // FIX: Damping factor for the physics calculation to prevent oscillations
   private physicsInterpolationFactor = 0.2; // How much to move towards the target each physics step
   
@@ -21,6 +21,8 @@ class XYModelSimulation {
 
   private frameCount = 0;
   private simulationSpeed = 5;
+  // NEW: Temperature property
+  private temperature = 0; // 0 = no noise, 1 = max noise
 
   private isMouseDownOnCanvas = false;
   private mousePos = { x: 0, y: 0 };
@@ -76,13 +78,19 @@ class XYModelSimulation {
   private setupEventListeners(): void {
     const resetButton = document.getElementById('reset-button')!;
     const speedSlider = document.getElementById('speed-slider') as HTMLInputElement;
+    const tempSlider = document.getElementById('temp-slider') as HTMLInputElement;
 
     resetButton.addEventListener('mousedown', (e) => e.stopPropagation());
     speedSlider.addEventListener('mousedown', (e) => e.stopPropagation());
+    tempSlider.addEventListener('mousedown', (e) => e.stopPropagation());
 
     resetButton.addEventListener('click', () => this.initializeGrid());
     speedSlider.addEventListener('input', (e) => {
       this.simulationSpeed = parseInt((e.target as HTMLInputElement).value);
+    });
+    tempSlider.addEventListener('input', (e) => {
+      // Map slider value (0-100) to a noise factor (0-1)
+      this.temperature = parseInt((e.target as HTMLInputElement).value) / 100;
     });
 
     window.addEventListener('resize', () => this.setupCanvas());
@@ -168,8 +176,15 @@ class XYModelSimulation {
         const newVecX = currentVecX * (1 - this.physicsInterpolationFactor) + targetVecX * this.physicsInterpolationFactor;
         const newVecY = currentVecY * (1 - this.physicsInterpolationFactor) + targetVecY * this.physicsInterpolationFactor;
         
+        let newAngle = Math.atan2(newVecY, newVecX);
+
+        // --- NEW: Apply the random temperature kick ---
+        // A full kick is 360 degrees (2*PI)
+        const randomKick = (Math.random() - 0.5) * this.temperature * 2 * Math.PI;
+        newAngle += randomKick;
+
         // Write the new, smoother state directly to the main grid
-        this.grid[x][y] = Math.atan2(newVecY, newVecX);
+        this.grid[x][y] = newAngle;
       }
     }
   }
