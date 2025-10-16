@@ -15,13 +15,9 @@ class XYModelSimulation {
   
   // FIX: Damping factor for the physics calculation to prevent oscillations
   private physicsInterpolationFactor = 0.2; // How much to move towards the target each physics step
-  
-  // Controls how fast arrows visually turn to their target angle
-  private renderInterpolationFactor = 0.1;
-
+    
   private frameCount = 0;
   private simulationSpeed = 5;
-  // NEW: Temperature property
   private temperature = 0; // 0 = no noise, 1 = max noise
 
   private isMouseDownOnCanvas = false;
@@ -196,6 +192,12 @@ class XYModelSimulation {
     this.ctx.strokeStyle = 'white';
     this.ctx.lineWidth = 1.5;
 
+    // --- JITTER FIX: Make the animation faster at high temperatures ---
+    // Controls how fast arrows visually turn to their target angle
+    // At temp=0, factor is 0.1 (very smooth).
+    // At temp=1, factor is 1.0 (instant snap).
+    const renderInterpolationFactor = 0.1 + (this.temperature * 0.9);
+
     for (let x = 0; x < this.gridSize; x++) {
       for (let y = 0; y < this.gridSize; y++) {
         const targetAngle = this.grid[x][y];
@@ -206,8 +208,8 @@ class XYModelSimulation {
         const targetVecX = Math.cos(targetAngle);
         const targetVecY = Math.sin(targetAngle);
 
-        const newVecX = currentVecX * (1 - this.renderInterpolationFactor) + targetVecX * this.renderInterpolationFactor;
-        const newVecY = currentVecY * (1 - this.renderInterpolationFactor) + targetVecY * this.renderInterpolationFactor;
+        const newVecX = currentVecX * (1 - renderInterpolationFactor) + targetVecX * renderInterpolationFactor;
+        const newVecY = currentVecY * (1 - renderInterpolationFactor) + targetVecY * renderInterpolationFactor;
         
         const renderAngle = Math.atan2(newVecY, newVecX);
         this.renderGrid[x][y] = renderAngle;
