@@ -1,20 +1,179 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-M" />
+    <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <meta property="og:title" content="Interactive U(1) XY Model Simulation" />
+    <meta
+      property="og:description"
+      content="Explore U(1) symmetry, phase transitions, and topological defects in this interactive physics simulation."
+    />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:url"
+      content="https://bobbyconnolly.com/u1-simulation/"
+    />
     <title>U(1) XY Model Simulation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,700&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
+    <div id="simulation-container">
+      <canvas id="simulation-canvas"></canvas>
+    </div>
+
     <div id="controls">
       <button id="reset-button">Restart</button>
-      <div class="slider-container">
-        <label for="speed-slider">Speed</label>
-        <input type="range" min="1" max="10" value="5" id="speed-slider" />
+
+      <button id="rotate-button" title="Hold to Rotate">
+        <div class="gauge-background"></div>
+        <div class="gauge-indicator"></div>
+        <span class="button-icon">↻</span>
+      </button>
+
+      <div class="slider-wrapper">
+        <div class="slider-container">
+          <label for="speed-slider">Speed</label>
+          <input type="range" min="1" max="10" value="5" id="speed-slider" />
+        </div>
+        <div class="slider-container">
+          <label for="temp-slider">Temp</label>
+          <input type="range" min="0" max="100" value="0" id="temp-slider" />
+        </div>
+      </div>
+
+      <button id="info-button" title="Info">i</button>
+    </div>
+
+    <div id="info-modal" class="hidden">
+      <div id="info-content">
+        <button id="info-close-button-desktop" class="info-close-button">
+          ×
+        </button>
+        <h2>What Am I Seeing?</h2>
+        <p>
+          This simulation visualizes a basic concept in physics: a
+          <strong>U(1) field</strong> on a 2D grid. Think of it like a field of
+          tiny compass needles that can point in any direction on a circle. The
+          system naturally wants to minimize its energy, which causes neighboring
+          arrows to align, leading to the fascinating patterns and ordering you
+          observe.
+        </p>
+        <hr />
+
+        <h4>Q: What are the arrows? Are they particles?</h4>
+        <p>
+          The arrows represent the fundamental <strong>U(1) field</strong>
+          itself, not particles. At every point in space, the field has a value
+          (its phase or angle). Particles, like electrons or positrons, would
+          emerge as stable, swirling patterns *in* this field, known as
+          <strong>vortices</strong> (🌀), which you might see forming as defects
+          when the system orders itself.
+        </p>
+
+        <h4>Q: How do the arrows know how to line up?</h4>
+        <p>
+          The simulation respects the circular nature (U(1) symmetry) of the
+          arrows' phase. To find the direction an arrow "wants" to point, we
+          don't just average the angles of its neighbors numerically. Instead, we
+          treat each neighbor's direction as a vector, add all those vectors
+          together, and find the angle of the resulting sum.
+        </p>
+        <pre><code>// Convert angles to vectors
+let avgX = 0;
+let avgY = 0;
+for (const angle of neighbors) {
+  avgX += Math.cos(angle);
+  avgY += Math.sin(angle);
+}
+// Find angle of the sum vector
+const targetAngle = Math.atan2(avgY, avgX);
+</code></pre>
+        <p>
+          This correctly handles the "wrap-around" nature of the circle – it's
+          like spinning a wheel multiple times and seeing where the final mark
+          lands (🛞). This vector averaging is the core logic driving the
+          alignment.
+        </p>
+
+        <h4>Q: Why does it order itself even with zero temperature?</h4>
+        <p>
+          The drive towards order comes from minimizing the system's internal
+          energy, not from temperature. A random, chaotic state is high-energy
+          because many neighboring arrows are misaligned. The alignment rule
+          naturally reduces this "tension." Temperature (the random kicks)
+          actually disrupts this process but also helps "melt" defects (like
+          vortices) that get frozen in during rapid ordering.
+        </p>
+
+        <h4>Q: Does the temperature slider correctly model physics?</h4>
+        <p>
+          Not perfectly. The random "kicks" we add violate a deeper principle
+          called <strong>local gauge symmetry</strong>. In real physics (like
+          electromagnetism), changes must be accounted for locally – phase can't
+          just appear, it has to "flow" as part of a transaction. A more
+          accurate simulation would introduce temperature via the spontaneous
+          creation and annihilation of balanced vortex/anti-vortex pairs,
+          conserving phase locally.
+        </p>
+
+        <h4>Q: What key physics is this simulation *missing*?</h4>
+        <p>
+          It's missing the strict local "accounting" mechanism enforced by
+          <strong>gauge symmetry</strong>. This mechanism requires a "gauge
+          field" (like the electromagnetic field) that lives on the connections
+          *between* the arrows and ensures phase is conserved in every
+          interaction. This local enforcement is what gives rise to
+          force-carrying particles (<strong>gauge bosons</strong>, like the
+          photon 💡) which are absent here. This simulation shows the field, but
+          not the force governing its interactions in a locally symmetric way.
+        </p>
+
+        <hr />
+        <p
+          style="
+            text-align: center;
+            font-size: 0.9em;
+            margin-top: 20px;
+          "
+        >
+          Find the source code on
+          <a
+            href="https://github.com/bobbyconnolly/u1"
+            target="_blank"
+            rel="noopener noreferrer"
+            >GitHub</a
+          >.
+        </p>
+
+        <button id="info-close-button-mobile" class="info-close-button fab">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M19 12H5M12 19L5 12L12 5"
+              stroke="currentColor"
+              stroke-width="3"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </button>
       </div>
     </div>
-    <canvas id="simulation-canvas"></canvas>
+
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
